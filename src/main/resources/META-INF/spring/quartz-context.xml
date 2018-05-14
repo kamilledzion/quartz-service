@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:camel="http://camel.apache.org/schema/spring"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+  <context:annotation-config/>
+
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="location">
+      <value>classpath:config.properties</value>
+    </property>
+  </bean>
+
+  <bean id="timeZone" class="java.util.TimeZone" factory-method="getTimeZone">
+    <constructor-arg value="${timeZone}"/>
+  </bean>
+
+  <bean name="job1" class="com.quartz.Job1"/>
+
+  <bean name="jobDetail1" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+    <property name="jobClass" value="com.quartz.Job1Scheduler"/>
+    <property name="durability" value="true"/>
+  </bean>
+
+  <bean id="trigger1" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+    <property name="jobDetail" ref="jobDetail1"/>
+    <property name="cronExpression" value="${job1.cronExp}"/>
+    <property name="timeZone" ref="timeZone"/>
+  </bean>
+
+  <bean name="job2" class="com.quartz.Job2"/>
+
+  <bean name="jobDetail2" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+    <property name="jobClass" value="com.quartz.Job2Scheduler"/>
+    <property name="durability" value="true"/>
+  </bean>
+
+  <bean id="trigger2" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+    <property name="jobDetail" ref="jobDetail2"/>
+    <property name="cronExpression" value="${job2.cronExp}"/>
+  </bean>
+
+  <bean name="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    <!--<property name="configLocation" value="classpath:quartz.properties"/>-->
+
+    <property name="schedulerContextAsMap">
+      <map>
+        <entry key="job1" value-ref="job1"/>
+        <entry key="job2" value-ref="job2"/>
+        <!--<entry key="CamelQuartzCamelContext-camel" value-ref="camel"/>-->
+      </map>
+    </property>
+    <property name="triggers">
+      <list>
+        <ref bean="trigger1"/>
+        <ref bean="trigger2"/>
+      </list>
+    </property>
+  </bean>
+
+  <bean id="quartz2" class="org.apache.camel.component.quartz2.QuartzComponent">
+    <property name="scheduler" ref="scheduler"/>
+  </bean>
+
+  <bean name="batchExecutor" class="com.quartz.BatchExecutor"/>
+
+  <bean name="schedulerService" class="com.quartz.SchedulerService"/>
+
+  <camel:camelContext xmlns="http://camel.apache.org/schema/spring" id="camel">
+
+    <restConfiguration component="jetty" bindingMode="json"
+      contextPath="/" port="8888"
+      apiContextPath="api-docs" apiContextListing="true"
+      enableCORS="true">
+
+      <dataFormatProperty key="prettyPrint" value="true"/>
+
+      <apiProperty key="api.version" value="0.0.1"/>
+      <apiProperty key="api.title" value="Test service"/>
+      <apiProperty key="api.description" value="Test description"/>
+      <apiProperty key="api.contact.name" value="The team"/>
+    </restConfiguration>
+
+    <route id="batchExecutorRoute">
+      <from uri="quartz2://batchSchedule?cron=0/10 * * ? * *&amp;recoverableJob=true"/>
+      <process ref="batchExecutor"/>
+    </route>
+
+    <route id="serviceScheduler">
+      <from uri="jetty:http://0.0.0.0:8888/serviceSchedule"/>
+      <process ref="serviceSchedule"/>
+    </route>
+
+  </camel:camelContext>
+
+</beans>
