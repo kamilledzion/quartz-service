@@ -51,7 +51,7 @@
       <map>
         <entry key="job1" value-ref="job1"/>
         <entry key="job2" value-ref="job2"/>
-        <!--<entry key="CamelQuartzCamelContext-camel" value-ref="camel"/>-->
+        <entry key="CamelQuartzCamelContext-camel" value-ref="camel"/>
       </map>
     </property>
     <property name="triggers">
