@@ -2,7 +2,6 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:context="http://www.springframework.org/schema/context"
-  xmlns:camel="http://camel.apache.org/schema/spring"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
 				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
@@ -70,7 +69,7 @@
 
   <bean name="schedulerService" class="com.quartz.SchedulerService"/>
 
-  <camel:camelContext xmlns="http://camel.apache.org/schema/spring" id="camel">
+  <camelContext xmlns="http://camel.apache.org/schema/spring" id="camel">
 
     <restConfiguration component="jetty" bindingMode="json"
       contextPath="/" port="8888"
@@ -95,6 +94,6 @@
       <process ref="serviceSchedule"/>
     </route>
 
-  </camel:camelContext>
+  </camelContext>
 
 </beans>
