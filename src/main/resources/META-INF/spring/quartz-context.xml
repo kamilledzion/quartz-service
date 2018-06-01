@@ -89,9 +89,9 @@
       <process ref="batchExecutor"/>
     </route>
 
-    <route id="serviceScheduler">
-      <from uri="jetty:http://0.0.0.0:8888/serviceSchedule"/>
-      <process ref="serviceSchedule"/>
+    <route id="scheduler">
+      <from uri="jetty:http://0.0.0.0:8888/scheduler"/>
+      <process ref="schedulerService"/>
     </route>
 
   </camelContext>
