@@ -14,7 +14,7 @@
     <org.springframework.version>4.3.18.RELEASE</org.springframework.version>
     <slf4j.version>1.7.7</slf4j.version>
     <java.version>1.8</java.version>
-    <quartz.version>2.3.0</quartz.version>
+    <quartz.version>2.3.2</quartz.version>
     <logback.version>1.2.3</logback.version>
     <!--<ojdbc.version>12.1.0.2</ojdbc.version>-->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
